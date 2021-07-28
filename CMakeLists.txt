@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.13)
+project(ObjView CXX)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+add_executable(objview objview.cpp)
+target_link_libraries(objview Qt5::Widgets)
+add_executable(sandbox sandbox.cpp parse.cpp)
+target_link_libraries(sandbox Qt5::Widgets)
