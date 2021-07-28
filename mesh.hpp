@@ -1,35 +1,43 @@
 #include <QVector3D>
+#include <array>
 #include <istream>
 #include <vector>
 
-struct edge {
-  edge(int a, int b)
-      : points{std::min(a, b), std::max(a, b)}, triangles{-1, -1},
-        triangle_starts{-1, -1} {}
-  std::array<int, 2> points;
-  std::array<int, 2> triangles;
-  std::array<int, 2> triangle_starts;
-};
+using point_id = int;
+using halfedge_id = int;
+using edge_id = int;
+using triangle_id = int;
 
-struct triangle {
-  triangle(std::array<int, 3> points) : points{points}, edges{-1, -1, -1} {}
-  std::array<int, 3> points;
-  std::array<int, 3> edges;
+struct halfedge {
+    halfedge(point_id start, point_id end)
+        : start{start}, end{end}, opposite{-1}, edge{-1}
+    {}
+
+    point_id start;
+    point_id end;
+    halfedge_id opposite;
+    edge_id edge;
 };
 
 struct mesh {
-  std::vector<QVector3D> points;
-  std::vector<std::array<int, 3>> triangles;
-};
-
-struct navigatable_mesh {
-  navigatable_mesh(mesh m);
-  std::vector<QVector3D> points;
-  std::vector<triangle> triangles;
-  std::vector<edge> edges;
-  std::vector<int> point_neighborhood_offsets;
-  std::vector<int> point_neighbors;
-  std::vector<int> point_triangles;
+    std::vector<QVector3D> points;
+    std::vector<std::array<point_id, 3>> triangles;
 };
 
 mesh parse_obj(std::istream &stream);
+
+struct navigatable_mesh : mesh {
+    navigatable_mesh(mesh m);
+    std::vector<halfedge> halfedges;
+    std::vector<QVector3D> point_normals;
+    std::vector<halfedge_id> point_to_halfedge;
+    std::vector<halfedge_id> edge_to_halfedge;
+
+    triangle_id halfedge_to_triangle(halfedge_id e);
+    halfedge_id triangle_to_halfedge(halfedge_id e);
+    halfedge_id next_around_triangle(halfedge_id e);
+    halfedge_id next_around_point(halfedge_id e);
+    QVector3D halfedge_vector(halfedge_id e);
+    QVector3D triangle_normal(triangle_id t);
+    float triangle_area(triangle_id t);
+};
