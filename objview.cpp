@@ -1,6 +1,7 @@
 #include <string>
 #include <vtkActor.h>
 #include <vtkCamera.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkNamedColors.h>
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
@@ -19,6 +20,14 @@ int main() {
   vtkColor3d back_color = colors->GetColor3d("White");
   vtkColor3d model_color = colors->GetColor3d("Silver");
   vtkNew<vtkPolyDataMapper> mapper;
+  auto point_data = poly_data->GetAttributes(vtkPolyData::POINT);
+  auto scalar_data = vtkDataArray::CreateDataArray(VTK_DOUBLE);
+  for (int i = 0; i < m.points.size(); i++) {
+    scalar_data->InsertTuple1(i, std::sin(m.points[i][0]) +
+                                     std::cos(m.points[i][1]) +
+                                     std::sin(m.points[i][2]));
+  }
+  point_data->SetScalars(scalar_data);
   mapper->SetInputData(poly_data);
   vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
