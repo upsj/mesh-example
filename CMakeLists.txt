@@ -3,6 +3,8 @@ project(ObjView CXX)
 find_package(VTK COMPONENTS 
     CommonColor
     CommonCore
+    FiltersProgrammable
+    FiltersSources
     IOGeometry
     InteractionStyle
     RenderingContextOpenGL2
